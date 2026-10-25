@@ -1,46 +1,35 @@
-# Astro Starter Kit: Basics
+# Tengku Zarul Fariman — Portfolio
+
+A static portfolio built with Astro and Tailwind CSS. The visual direction takes cues from editorial retail and streetwear: a clear point of view, strong project imagery, and an easy-to-browse collection. Visitors can add projects to a cart; there is no checkout.
+
+## Get started
 
 ```sh
-npm create astro@latest -- --template basics
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The development server runs at `http://localhost:4321`. Build the static site with `npm run build`, then preview it with `npm run preview`.
 
-## 🚀 Project Structure
+## Portfolio content
 
-Inside of your Astro project, you'll see the following folders and files:
+Portfolio details and project content live in `src/data/portfolio.ts`. Each project becomes a static detail page at `/projects/<slug>/`; keep each `slug` unique and URL-friendly. Project images, videos, reports, and the resume are imported from `src/assets`.
+
+The project catalog, detail routes, About, Resume, and Contact pages are statically generated. Cart contents and the selected display currency are optional browser-side preferences stored in local storage; the rest of the portfolio works without JavaScript. Project prices are currently RM 0.00 and shown as “Free to peek.”
+
+## Project structure
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+src/
+  components/ProductCard.astro
+  data/portfolio.ts
+  layouts/Layout.astro
+  pages/
+    about.astro
+    contact.astro
+    index.astro
+    projects/[slug].astro
+    resume.astro
+  styles/global.css
+public/
 ```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
