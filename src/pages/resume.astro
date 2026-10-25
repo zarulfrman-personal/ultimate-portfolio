@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { portfolio } from '../data/portfolio';
+---
+
+<Layout title={`Resume — ${portfolio.name}`} description={`Resume and experience for ${portfolio.name}.`}>
+	<section class="simple-page resume-page">
+		<p class="eyebrow">THE PRACTICAL STUFF</p>
+		<div class="resume-heading">
+			<div><h1>Experience,<br /><span>at a glance.</span></h1><p class="page-lede">A concise overview of my background, skills, and experience. Feel free to download.</p></div>
+			{portfolio.resumeAvailable && <a class="button button-dark" href={portfolio.resumePath} download>Download PDF <span aria-hidden="true">↓</span></a>}
+		</div>
+		{portfolio.resumeAvailable ? (
+			<div class="resume-preview">
+				<div class="resume-preview-head"><span>{portfolio.name}</span><a href={portfolio.resumePath} target="_blank" rel="noreferrer">Open in new tab ↗</a></div>
+				<iframe src={`${portfolio.resumePath}#view=FitH`} title={`${portfolio.name} resume PDF`} loading="lazy"></iframe>
+			</div>
+		) : (
+			<div class="resume-placeholder">
+				<span class="resume-file-icon" aria-hidden="true">PDF</span>
+				<div><h2>Your resume will live here.</h2><p>Add your PDF to the assets folder and set its imported path and <code>resumeAvailable</code> value in <code>src/data/portfolio.ts</code> to enable the preview and download links.</p></div>
+			</div>
+		)}
+		<div class="resume-content">
+			<p class="eyebrow">BEYOND THE PAGE</p>
+			<h2>See the work behind the experience.</h2>
+			<p>Browse the project notes for a closer look at the systems, tools, and contributions behind selected work.</p>
+			<a class="text-link" href="/#catalog">Explore selected projects <span aria-hidden="true">↗</span></a>
+		</div>
+	</section>
+</Layout>

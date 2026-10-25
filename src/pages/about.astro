@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { portfolio } from '../data/portfolio';
+import { Image } from 'astro:assets';
+import githubIcon from '../assets/github-icon-2.svg';
+import aptisResult from '../assets/aptis-cert.png';
+import googleDataAnalyticsCertificate from '../assets/Coursera Google Data Analytics Cert.pdf';
+---
+
+<Layout title={`About — ${portfolio.name}`} description={`A little more about ${portfolio.name} and how they work.`}>
+	<section class="simple-page about-page">
+		<p class="eyebrow"><span class="status-dot"></span> A NOTE FROM THE MAKER</p>
+		<h1>Hello, I’m {portfolio.name}<span class="accent-period">.</span></h1>
+		<p class="page-lede">
+			I’m an aspiring freshie in tech, based in {portfolio.location}. I graduated with a Bachelor of Computer Science in Software Engineering from International Islamic University Malaysia, with a 3.93 CGPA.
+		</p>
+		<div class="about-page-grid">
+			<div class="about-page-copy">
+				<p class="eyebrow">A LITTLE ABOUT ME</p>
+				<h2>Not just the code. The whole thing.</h2>
+				<p>I wouldn’t say I’m heavily focused on code and emerging technologies just for the sake of it. If an opportunity comes up, I don’t want to blindly dive in. I want to understand it and get the most out of it. That’s the principle behind how I work—for now, anyway. People always evolve.</p>
+				<p>I believe the most essential perspective when you “engineer” something is to look at its main intent and purpose. That’s why software engineering feels right to me: you get to feel ownership of what you’re engineering. Not just a developer writing code, but also the person on the receiving end: the user.</p>
+				<a class="button button-dark" href="/contact/">Get in touch <span aria-hidden="true">↗</span></a>
+			</div>
+		</div>
+		<section class="about-journey" aria-labelledby="about-journey-title">
+			<p class="eyebrow">HOW I GOT HERE</p>
+			<h2 id="about-journey-title">A bit of the journey.</h2>
+			<div class="about-journey-grid">
+				<article>
+					<p class="eyebrow">FIRST UP · SETEL</p>
+					<h3>Learning to solve problems where they happen.</h3>
+					<p>My first experience was an internship at Setel, the PETRONAS fueling app, as an L3 System Support Engineer. The role is the last line of defense when issues come up, before they reach the developers. This is where I really learned what problem-solving looks like at production level.</p>
+					<p>Over six months, I solved 297 production tickets across several different portfolios in the mobile application. I was able to make an impact, even as an intern, and that meant a lot to me.</p>
+				</article>
+				<article>
+					<p class="eyebrow">THEN · SOFTWARE ENGINEERING</p>
+					<h3>Looking for more of the problem to own.</h3>
+					<p>After that, the L3 role started to feel a little limiting. I didn’t have enough code exposure or a full view of the problem-solving cycle, and I wanted to understand more of the whole flow. That’s what led me to my current role.</p>
+					<p>I’m now a full-time Software Engineer working full-stack on a web application. Within eight months, I took ownership of several CORE modules and became an important member of a small team. The full ownership I’d been looking for is actually in my grasp now—not necessarily a good or bad thing, just the thing I wanted.</p>
+				</article>
+			</div>
+		</section>
+		<div class="about-facts">
+			<div><span>DEGREE</span><strong>Bachelor of Computer Science (Software Engineering)</strong></div>
+			<div><span>UNIVERSITY</span><strong>International Islamic University Malaysia</strong></div>
+			<div><span>RECOGNITION</span><strong>Best Overall Student · KICT</strong></div>
+			<div><span>BEFORE THAT</span><strong>High School Bukit Mertajam</strong></div>
+		</div>
+		<section class="about-certifications" aria-labelledby="about-certifications-title">
+			<div class="project-section-heading">
+				<p class="eyebrow">A FEW THINGS I’VE EARNED</p>
+				<h2 id="about-certifications-title">Certificates &amp; learning.</h2>
+			</div>
+			<div class="about-certification-grid">
+				<article class="about-certification-card">
+					<div class="about-certification-heading">
+						<div><p class="eyebrow">ENGLISH · BRITISH COUNCIL</p><h3>Aptis General</h3></div>
+						<span>2024</span>
+					</div>
+					<figure class="aptis-result">
+						<Image src={aptisResult} alt="British Council Aptis candidate report showing a final scale score of 193 out of 200" loading="lazy" />
+						<figcaption>Aptis English test candidate report</figcaption>
+					</figure>
+				</article>
+				<article class="about-certification-card">
+					<div class="about-certification-heading">
+						<div><p class="eyebrow">DATA ANALYTICS · COURSERA</p><h3>Google Data Analytics Professional Certificate</h3></div>
+					</div>
+					<div class="resume-preview certification-preview">
+						<div class="resume-preview-head">
+							<span>Google Data Analytics Professional Certificate</span>
+							<a href={googleDataAnalyticsCertificate} target="_blank" rel="noreferrer">Open PDF ↗</a>
+						</div>
+						<iframe
+							src={`${googleDataAnalyticsCertificate}#view=FitH`}
+							title="Google Data Analytics Professional Certificate"
+							loading="lazy"
+						></iframe>
+					</div>
+				</article>
+			</div>
+		</section>
+		<section class="github-profile" aria-labelledby="github-profile-title">
+			<div>
+				<p class="eyebrow">OUT IN THE OPEN</p>
+				<h2 id="github-profile-title">Find me on GitHub.</h2>
+				<p>GitHub doesn’t allow profile pages to be embedded in other sites, so here’s a direct link to my profile instead. I procrastinate a lot, so there arent a lot of repos, but best believe its a work in progress!</p>
+			</div>
+			<a href={portfolio.github} target="_blank" rel="noreferrer">
+				<Image src={githubIcon} alt="" width={28} height={28} />
+				<span><strong>zarulfrman-personal</strong><small>Visit my GitHub profile ↗</small></span>
+			</a>
+		</section>
+		<section class="convocation-book" aria-labelledby="convocation-title">
+			<div class="project-section-heading">
+				<p class="eyebrow">THE RECEIPT, SO TO SPEAK</p>
+				<h2 id="convocation-title">Find me in the convocation book.</h2>
+				<p class="page-lede">For the Best Overall Student recognition, head to pages 196–197 of IIUM’s 41st Convocation Book.</p>
+			</div>
+			<div class="resume-preview convocation-preview">
+				<div class="resume-preview-head">
+					<span>IIUM Convocation Book · 41st Convocation</span>
+					<a href="https://photos.iium.edu.my/flip/convo41book/" target="_blank" rel="noreferrer">Open convocation book ↗</a>
+				</div>
+				<iframe
+					src="https://photos.iium.edu.my/flip/convo41book/"
+					title="IIUM 41st Convocation Book"
+					loading="lazy"
+					referrerpolicy="strict-origin-when-cross-origin"
+				></iframe>
+			</div>
+		</section>
+	</section>
+</Layout>

@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { portfolio } from '../data/portfolio';
+import { Image } from 'astro:assets';
+import LinkedInImage from '../assets/linkedin-icon-2.svg';
+import GitHubImage from '../assets/github-icon-2.svg';
+---
+
+<Layout title={`Contact — ${portfolio.name}`} description={`Get in touch with ${portfolio.name}.`}>
+	<section class="simple-page contact-page">
+		<p class="eyebrow"><span class="status-dot"></span> THE DOOR IS OPEN</p>
+		<h1>Contact me, <br /><span>please?</span></h1>
+		<p class="page-lede">Just kidding. Interested in working together, have an opportunity to share, or simply want to say hello? It'll be nice to connect!</p>
+		<a class="contact-email" href={`mailto:${portfolio.email}`}>{portfolio.email}<span aria-hidden="true">↗</span></a>
+		<div class="contact-links">
+			<a href={portfolio.linkedin} target="_blank" rel="noreferrer">
+				<Image src={LinkedInImage} alt="" width={20} height={20} />
+				LinkedIn <span aria-hidden="true">↗</span>
+			</a>
+			<a href={portfolio.github} target="_blank" rel="noreferrer">
+				<Image src={GitHubImage} alt="" width={20} height={20} />
+				GitHub <span aria-hidden="true">↗</span>
+			</a>
+		</div>
+	</section>
+</Layout>

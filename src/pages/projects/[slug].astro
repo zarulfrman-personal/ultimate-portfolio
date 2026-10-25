@@ -1,0 +1,148 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { portfolio, projects } from '../../data/portfolio';
+import { Image } from 'astro:assets';
+import githubIcon from '../../assets/github-icon-2.svg';
+
+export function getStaticPaths() {
+	return projects.map((project) => ({
+		params: { slug: project.slug },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+---
+
+<Layout title={`${project.title} — ${portfolio.name}`} description={project.description}>
+	<article class="project-detail">
+		<div class:list={['detail-art', `art-${project.color}`, { 'detail-art-with-image': project.previewImage }]}>
+			<a class="back-link" href="/#catalog"><span aria-hidden="true">←</span> Back to selected work</a>
+			{project.previewImage ? (
+				<Image
+					class="detail-art-image"
+					src={project.previewImage}
+					alt={project.previewAlt}
+					fetchpriority="high"
+				/>
+			) : (
+				<div class="detail-poster" aria-hidden="true">
+					<span class="detail-poster-index">SELECTED WORK&nbsp; / &nbsp;{project.mark}</span>
+					<span class="detail-poster-heading">{project.visualHeading}</span>
+					<span class="detail-poster-subheading">{project.visualSubheading}</span>
+				</div>
+			)}
+			<span class="detail-art-label">{project.category} · {project.contextLabel}</span>
+		</div>
+
+		<div class="detail-content">
+			<div class="detail-title">
+				<p class="eyebrow">{project.category} <span class="detail-title-mark">/ {project.mark}</span></p>
+				<h1>{project.title}</h1>
+				<p class="detail-lede">{project.description}</p>
+				<p class="product-price detail-price">
+					<svg class="price-cash-icon" viewBox="0 0 24 24" aria-hidden="true">
+						<rect x="2.5" y="5.5" width="19" height="13" rx="1.5"></rect>
+						<circle cx="12" cy="12" r="3"></circle>
+						<path d="M5.5 9a2 2 0 0 0 2-2M18.5 15a2 2 0 0 0-2 2"></path>
+					</svg>
+					<span class="price-amount" data-price-amount={project.price}>RM 0.00</span>
+					<span class="price-divider">·</span>
+					<span>Free to peek</span>
+				</p>
+				<button class="cart-add-button detail-cart-add" type="button" data-cart-project={project.slug} aria-pressed="false" aria-label={`Add ${project.title} to cart`}>
+					<span class="cart-add-symbol" aria-hidden="true">+</span>
+					<span class="cart-add-label">Add to cart</span>
+				</button>
+			</div>
+			<dl class="project-facts">
+				<div><dt>MADE WITH</dt><dd>{project.tools.join(' · ')}</dd></div>
+				<div><dt>PROJECT TYPE</dt><dd>{project.contextLabel}</dd></div>
+				<div><dt>FIELD</dt><dd>{project.category}</dd></div>
+			</dl>
+			<div class="case-study">
+				<section><p class="eyebrow">01 — THE BRIEF</p><h2>Where it began</h2><p>{project.context}</p></section>
+				<section><p class="eyebrow">02 — THE BUILD</p><h2>How it works</h2><p>{project.approach}</p></section>
+			</div>
+			{project.gallery.length > 0 && (
+				<section class="project-gallery" aria-label={`${project.title} project images`}>
+					{project.gallery.map((item, index) => (
+						<figure class:list={['gallery-item', { 'gallery-item-wide': index === 0 && project.gallery.length > 2 }]}>
+							<Image src={item.image} alt={item.alt} loading="lazy" />
+							<figcaption><span>{item.caption}</span><span>{String(index + 1).padStart(2, '0')}</span></figcaption>
+						</figure>
+					))}
+				</section>
+			)}
+			{project.videos.length > 0 && (
+				<section class="project-videos" aria-labelledby="project-videos-title">
+					<div class="project-section-heading">
+						<p class="eyebrow">IN MOTION</p>
+						<h2 id="project-videos-title">See it for yourself.</h2>
+					</div>
+					<div class="video-grid">
+						{project.videos.map((video) => (
+							<figure class="video-item">
+								<video
+									src={video.src}
+									poster={video.poster}
+									controls
+									playsinline
+									preload="metadata"
+									aria-label={video.title}
+								></video>
+								<figcaption><strong>{video.title}</strong><span>{video.caption}</span></figcaption>
+							</figure>
+						))}
+					</div>
+				</section>
+			)}
+			{project.documents.length > 0 && (
+				<section class="project-documents" aria-labelledby="project-documents-title">
+					<div class="project-section-heading">
+						<p class="eyebrow">PROJECT DOCUMENTATION</p>
+						<h2 id="project-documents-title">Read the report.</h2>
+					</div>
+					{project.documents.map((document) => (
+						<div class="resume-preview project-document">
+							<div class="resume-preview-head">
+								<span>{document.title}</span>
+								<a href={document.src} target="_blank" rel="noreferrer">Open in new tab ↗</a>
+							</div>
+							<iframe
+								src={`${document.src}#view=FitH`}
+								title={document.title}
+								loading="lazy"
+							></iframe>
+						</div>
+					))}
+				</section>
+			)}
+			{project.slug === 'file-cloud-server-system' && (
+				<section class="repository-preview" aria-labelledby="repository-preview-title">
+					<div>
+						<p class="eyebrow">THE SOURCE</p>
+						<h2 id="repository-preview-title">See how it’s put together.</h2>
+						<p>The project repository has the code and setup notes for the cloud server and its clients. GitHub blocks its pages from being embedded here, but you can open the repo directly.</p>
+					</div>
+					<a href="https://github.com/zarulfrman-personal/filecloudserversystem" target="_blank" rel="noreferrer">
+						<Image src={githubIcon} alt="" width={24} height={24} />
+						<span><strong>filecloudserversystem</strong><small>Open project repository ↗</small></span>
+					</a>
+				</section>
+			)}
+			{project.links.length > 0 && (
+				<nav class="project-links" aria-label="Project links">
+					<p class="eyebrow">EXPLORE FURTHER</p>
+					{project.links.map((link) => (
+						<a href={link.href} target="_blank" rel="noreferrer">{link.label}<span aria-hidden="true">↗</span></a>
+					))}
+				</nav>
+			)}
+			<div class="detail-next">
+				<p>More projects, different problems to solve.</p>
+				<a class="button button-dark" href="/#catalog">Back to selected work <span aria-hidden="true">↗</span></a>
+			</div>
+		</div>
+	</article>
+</Layout>
