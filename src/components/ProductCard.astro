@@ -1,0 +1,62 @@
+---
+import type { Project } from '../data/portfolio';
+import { Image } from 'astro:assets';
+
+interface Props {
+	project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<article class:list={['product-card', `art-${project.color}`]} data-category={project.category}>
+	<a class:list={['product-art', { 'product-art-has-cover': project.previewImage || project.previewAnimation }]} href={`/projects/${project.slug}/`} aria-label={`View ${project.title}`}>
+		{project.previewAnimation ? (
+			<img
+				class="product-cover-image product-cover-image-animation"
+				src={project.previewAnimation.src}
+				alt={project.previewAlt}
+			/>
+		) : project.previewImage ? (
+			<Image
+				class:list={['product-cover-image', { 'product-cover-image-contain': project.slug === 'shuttle-aide' }]}
+				src={project.previewImage}
+				alt={project.previewAlt}
+			/>
+		) : (
+			<div class="project-poster" aria-hidden="true">
+				<span class="poster-index">SELECTED WORK&nbsp; / &nbsp;{project.mark}</span>
+				<span class="poster-orbit poster-orbit-one"></span>
+				<span class="poster-orbit poster-orbit-two"></span>
+				<span class="poster-heading">{project.visualHeading}</span>
+				<span class="poster-subheading">{project.visualSubheading}</span>
+				<span class="poster-category">{project.category}</span>
+			</div>
+		)}
+	</a>
+	<div class="product-info">
+		<div class="product-copy">
+			<h3><a href={`/projects/${project.slug}/`}>{project.title}</a></h3>
+			<p class="product-price">
+				<svg class="price-cash-icon" viewBox="0 0 24 24" aria-hidden="true">
+					<rect x="2.5" y="5.5" width="19" height="13" rx="1.5"></rect>
+					<circle cx="12" cy="12" r="3"></circle>
+					<path d="M5.5 9a2 2 0 0 0 2-2M18.5 15a2 2 0 0 0-2 2"></path>
+				</svg>
+				<span class="price-amount" data-price-amount={project.price}>RM 0.00</span>
+				<span class="price-divider">·</span>
+				<span>Free to peek</span>
+			</p>
+		</div>
+		<button
+			class="cart-add-button"
+			type="button"
+			data-cart-project={project.slug}
+			aria-pressed="false"
+			aria-label={`Add ${project.title} to cart`}
+		>
+			<span class="cart-add-symbol" aria-hidden="true">+</span>
+			<span class="cart-add-label">Add to cart</span>
+		</button>
+	</div>
+</article>
