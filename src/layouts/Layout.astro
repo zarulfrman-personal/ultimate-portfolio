@@ -1,23 +1,259 @@
+---
+import '../styles/global.css';
+import { portfolio, projects } from '../data/portfolio';
+import { Image } from 'astro:assets';
+import shoppingCart from '../assets/shopping-cart.svg';
+import portfolioIcon from '../assets/portfolio-bodega.svg';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = `${portfolio.name} — Portfolio`,
+	description = portfolio.introduction,
+} = Astro.props;
+const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }));
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href={portfolioIcon.src} />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#ffffff" />
+		<title>{title}</title>
 	</head>
 	<body>
-		<slot />
+		<a class="skip-link" href="#main-content">Skip to content</a>
+		<div class="site-shell">
+			<header class="site-header">
+				<a class="wordmark" href="/" aria-label={`${portfolio.name} home`}>
+					<img class="wordmark-mark" src={portfolioIcon.src} alt="" width="36" height="36" />
+					<span>{portfolio.name}<small>BODEGA PORTFOLIO</small></span>
+				</a>
+				<nav class="main-nav" aria-label="Main navigation">
+					<a href="/#catalog">Work</a>
+					<a href="/about/">About</a>
+					<a href="/resume/">Resume</a>
+					<a href="/contact/">Contact</a>
+				</nav>
+				<label class="currency-selector">
+					<span class="visually-hidden">Display currency</span>
+					<select id="currency-select" aria-label="Display currency">
+						<option value="MYR" selected>MYR</option>
+						<option value="USD">USD</option>
+						<option value="EUR">EUR</option>
+						<option value="GBP">GBP</option>
+					</select>
+				</label>
+				<button class="bag-trigger" type="button" aria-expanded="false" aria-controls="bag-panel" aria-label="Open cart">
+					<Image src={shoppingCart} alt="" width={20} height={20} class="cart-icon" />
+					<span>Cart</span>
+					<span class="bag-count" id="bag-count" aria-live="polite">0</span>
+				</button>
+			</header>
+
+			<main id="main-content">
+				<slot />
+			</main>
+
+			<footer class="site-footer">
+				<a class="footer-wordmark" href="/">{portfolio.name}<span>© {new Date().getFullYear()}</span></a>
+				<p>Software, systems, and ideas made with care.</p>
+				<a href="/contact/">Let’s connect <span aria-hidden="true">↗</span></a>
+			</footer>
+		</div>
+
+		<div class="bag-backdrop" data-bag-close hidden></div>
+		<aside class="bag-panel" id="bag-panel" aria-label="Shopping cart" aria-hidden="true" inert>
+			<div class="bag-panel-head">
+				<div>
+					<p class="eyebrow">YOUR CART</p>
+					<h2>Projects in your cart <span id="bag-heading-count">(0)</span></h2>
+				</div>
+				<button class="icon-button" type="button" data-bag-close aria-label="Close shopping cart">×</button>
+			</div>
+			<p class="bag-hint">A little collection of projects to explore. Nothing to pay—just free to peek.</p>
+			<div class="bag-items" id="bag-items" data-projects={JSON.stringify(catalog)}></div>
+			<p class="bag-empty" id="bag-empty">Your cart is empty. Add a project that catches your eye.</p>
+			<div class="bag-total"><span>Subtotal</span><strong id="bag-subtotal">RM 0.00</strong></div>
+			<p class="bag-free-note"><span aria-hidden="true">✓</span> Every project is free to peek</p>
+			<a class="button button-dark bag-contact" href="/#catalog">Continue browsing <span aria-hidden="true">↗</span></a>
+		</aside>
+
+		<script>
+			const currencySelect = document.querySelector<HTMLSelectElement>('#currency-select');
+			let currentCurrency = 'MYR';
+			if (currencySelect) {
+				const supportedCurrencies = ['MYR', 'USD', 'EUR', 'GBP'];
+				try {
+					const savedCurrency = localStorage.getItem('portfolio-shop-currency');
+					if (savedCurrency && supportedCurrencies.includes(savedCurrency)) {
+						currencySelect.value = savedCurrency;
+					}
+					currentCurrency = currencySelect.value;
+				} catch {
+					currencySelect.title = 'Currency preference could not be loaded in this browser.';
+				}
+			}
+			const formatPrice = (amount: number) => new Intl.NumberFormat('en-MY', {
+				style: 'currency',
+				currency: currentCurrency,
+			}).format(amount);
+			const updatePriceLabels = () => {
+				document.querySelectorAll<HTMLElement>('[data-price-amount]').forEach((price) => {
+					price.textContent = formatPrice(Number(price.dataset.priceAmount ?? 0));
+				});
+			};
+
+			const bagTrigger = document.querySelector<HTMLButtonElement>('.bag-trigger');
+			const bagPanel = document.querySelector<HTMLElement>('#bag-panel');
+			const bagBackdrop = document.querySelector<HTMLElement>('.bag-backdrop');
+			const bagCount = document.querySelector<HTMLElement>('#bag-count');
+			const bagHeadingCount = document.querySelector<HTMLElement>('#bag-heading-count');
+			const bagItems = document.querySelector<HTMLElement>('#bag-items');
+			const bagEmpty = document.querySelector<HTMLElement>('#bag-empty');
+			const bagSubtotal = document.querySelector<HTMLElement>('#bag-subtotal');
+			const bagCloseButtons = document.querySelectorAll<HTMLElement>('[data-bag-close]');
+
+			if (bagTrigger && bagPanel && bagBackdrop && bagCount && bagHeadingCount && bagItems && bagEmpty && bagSubtotal) {
+				const catalog = JSON.parse(bagItems.dataset.projects ?? '[]') as { slug: string; title: string; price: number }[];
+				let cartSlugs: string[] = [];
+				let storageAvailable = true;
+
+				try {
+					const storedCart = localStorage.getItem('portfolio-shop-cart');
+					const legacyCart = storedCart === null ? localStorage.getItem('portfolio-shop-saved') : null;
+					cartSlugs = JSON.parse(storedCart ?? legacyCart ?? '[]') as string[];
+					if (!Array.isArray(cartSlugs) || !cartSlugs.every((slug) => typeof slug === 'string')) {
+						cartSlugs = [];
+					}
+				} catch {
+					storageAvailable = false;
+				}
+
+				const save = () => {
+					if (!storageAvailable) return;
+					try {
+						localStorage.setItem('portfolio-shop-cart', JSON.stringify(cartSlugs));
+					} catch {
+						storageAvailable = false;
+						const hint = document.querySelector<HTMLElement>('.bag-hint');
+						if (hint) hint.textContent = 'Your cart is available for this visit only; browser storage is unavailable.';
+					}
+				};
+
+				const renderBag = () => {
+					cartSlugs = cartSlugs.filter((slug, index) =>
+						catalog.some((project) => project.slug === slug) && cartSlugs.indexOf(slug) === index,
+					);
+					bagCount.textContent = String(cartSlugs.length);
+					bagHeadingCount.textContent = `(${cartSlugs.length})`;
+					bagEmpty.hidden = cartSlugs.length > 0;
+					bagItems.replaceChildren();
+					let total = 0;
+
+					for (const slug of cartSlugs) {
+						const project = catalog.find((item) => item.slug === slug);
+						if (!project) continue;
+						total += project.price;
+						const row = document.createElement('div');
+						row.className = 'bag-item';
+						const details = document.createElement('div');
+						details.className = 'bag-item-details';
+						const link = document.createElement('a');
+						link.href = `/projects/${project.slug}/`;
+						link.textContent = project.title;
+						const price = document.createElement('span');
+						price.className = 'bag-item-price';
+						price.textContent = `${formatPrice(project.price)} · Free to peek`;
+						details.append(link, price);
+						const remove = document.createElement('button');
+						remove.type = 'button';
+						remove.className = 'bag-remove';
+						remove.textContent = 'Remove';
+						remove.setAttribute('aria-label', `Remove ${project.title} from cart`);
+						remove.addEventListener('click', () => {
+							cartSlugs = cartSlugs.filter((item) => item !== slug);
+							save();
+							renderBag();
+							updateCartButtons();
+						});
+						row.append(details, remove);
+						bagItems.append(row);
+					}
+					bagSubtotal.textContent = formatPrice(total);
+					save();
+				};
+
+				const updateCartButtons = () => {
+					document.querySelectorAll<HTMLButtonElement>('[data-cart-project]').forEach((button) => {
+						const inCart = cartSlugs.includes(button.dataset.cartProject ?? '');
+						button.setAttribute('aria-pressed', String(inCart));
+						button.setAttribute('aria-label', `${inCart ? 'Remove' : 'Add'} ${catalog.find((project) => project.slug === button.dataset.cartProject)?.title ?? 'project'} ${inCart ? 'from' : 'to'} cart`);
+						button.querySelector<HTMLElement>('.cart-add-label')!.textContent = inCart ? 'In cart' : 'Add to cart';
+						button.querySelector<HTMLElement>('.cart-add-symbol')!.textContent = inCart ? '✓' : '+';
+					});
+				};
+
+				const closeBag = () => {
+					bagPanel.setAttribute('aria-hidden', 'true');
+					bagPanel.setAttribute('inert', '');
+					bagBackdrop.hidden = true;
+					bagTrigger.setAttribute('aria-expanded', 'false');
+					document.body.classList.remove('bag-open');
+					bagTrigger.focus();
+				};
+
+				const openBag = () => {
+					bagPanel.removeAttribute('inert');
+					bagPanel.setAttribute('aria-hidden', 'false');
+					bagBackdrop.hidden = false;
+					bagTrigger.setAttribute('aria-expanded', 'true');
+					document.body.classList.add('bag-open');
+					bagPanel.querySelector<HTMLButtonElement>('.icon-button')?.focus();
+				};
+
+				bagTrigger.addEventListener('click', () => {
+					bagTrigger.getAttribute('aria-expanded') === 'true' ? closeBag() : openBag();
+				});
+				bagCloseButtons.forEach((button) => button.addEventListener('click', closeBag));
+				document.addEventListener('keydown', (event) => {
+					if (event.key === 'Escape' && bagTrigger.getAttribute('aria-expanded') === 'true') closeBag();
+				});
+				document.querySelectorAll<HTMLButtonElement>('[data-cart-project]').forEach((button) => {
+					button.addEventListener('click', () => {
+						const slug = button.dataset.cartProject;
+						if (!slug) return;
+						cartSlugs = cartSlugs.includes(slug)
+							? cartSlugs.filter((item) => item !== slug)
+							: [...cartSlugs, slug];
+						save();
+						renderBag();
+						updateCartButtons();
+					});
+				});
+
+				currencySelect?.addEventListener('change', () => {
+					currentCurrency = currencySelect.value;
+					try {
+						localStorage.setItem('portfolio-shop-currency', currentCurrency);
+					} catch {
+						currencySelect.title = 'Currency preference could not be saved in this browser.';
+					}
+					updatePriceLabels();
+					renderBag();
+				});
+
+				updatePriceLabels();
+				renderBag();
+				updateCartButtons();
+			}
+		</script>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
