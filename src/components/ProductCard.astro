@@ -1,6 +1,7 @@
 ---
 import type { Project } from '../data/portfolio';
 import { Image } from 'astro:assets';
+import { Button } from '@starwind-ui/astro/button';
 
 interface Props {
 	project: Project;
@@ -9,7 +10,11 @@ interface Props {
 const { project } = Astro.props;
 ---
 
-<article class:list={['product-card', `art-${project.color}`]} data-category={project.category}>
+<article
+	class:list={['product-card', `art-${project.color}`]}
+	data-category={project.category}
+	data-search={`${project.title} ${project.category} ${project.description} ${project.tools.join(' ')}`}
+>
 	<a class:list={['product-art', { 'product-art-has-cover': project.previewImage || project.previewAnimation }]} href={`/projects/${project.slug}/`} aria-label={`View ${project.title}`}>
 		{project.previewAnimation ? (
 			<img
@@ -48,7 +53,7 @@ const { project } = Astro.props;
 				<span>Free to peek</span>
 			</p>
 		</div>
-		<button
+		<Button.Root
 			class="cart-add-button"
 			type="button"
 			data-cart-project={project.slug}
@@ -57,6 +62,6 @@ const { project } = Astro.props;
 		>
 			<span class="cart-add-symbol" aria-hidden="true">+</span>
 			<span class="cart-add-label">Add to cart</span>
-		</button>
+		</Button.Root>
 	</div>
 </article>

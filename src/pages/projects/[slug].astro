@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { portfolio, projects } from '../../data/portfolio';
 import { Image } from 'astro:assets';
 import githubIcon from '../../assets/github-icon-2.svg';
+import { Button } from '@starwind-ui/astro/button';
 
 export function getStaticPaths() {
 	return projects.map((project) => ({
@@ -50,10 +51,10 @@ const { project } = Astro.props;
 					<span class="price-divider">·</span>
 					<span>Free to peek</span>
 				</p>
-				<button class="cart-add-button detail-cart-add" type="button" data-cart-project={project.slug} aria-pressed="false" aria-label={`Add ${project.title} to cart`}>
+				<Button.Root class="cart-add-button detail-cart-add" type="button" data-cart-project={project.slug} aria-pressed="false" aria-label={`Add ${project.title} to cart`}>
 					<span class="cart-add-symbol" aria-hidden="true">+</span>
 					<span class="cart-add-label">Add to cart</span>
-				</button>
+				</Button.Root>
 			</div>
 			<dl class="project-facts">
 				<div><dt>MADE WITH</dt><dd>{project.tools.join(' · ')}</dd></div>

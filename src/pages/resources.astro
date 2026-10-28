@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { portfolio } from '../data/portfolio';
+---
+
+<Layout title={`Resources & credits — ${portfolio.name}`} description={`The tools, platforms, and resources used to create ${portfolio.name}'s portfolio.`}>
+	<section class="simple-page resources-page">
+		<p class="eyebrow"><span class="status-dot"></span> A LITTLE CREDIT WHERE IT'S DUE</p>
+		<h1>Made with a little help<span class="accent-period">.</span></h1>
+		<p class="page-lede">A few of the tools and resources behind this portfolio, from the framework that brings it to life to the icons sprinkled throughout.</p>
+
+		<div class="resources-grid">
+			<section class="resource-group" aria-labelledby="resource-assets-title">
+				<div class="resource-group-heading">
+					<span class="resource-index" aria-hidden="true">01</span>
+					<div>
+						<p class="eyebrow">VISUAL INGREDIENTS</p>
+						<h2 id="resource-assets-title">Icons &amp; assets</h2>
+					</div>
+				</div>
+				<p class="resource-intro">A few handy places for the visual details used across the site.</p>
+				<ul class="resource-list">
+					<li>
+						<a href="https://worldvectorlogo.com/" target="_blank" rel="noreferrer">
+							<span><strong>WorldVectorLogo</strong><small>SVG logo resources</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.flaticon.com/" target="_blank" rel="noreferrer">
+							<span><strong>Flaticon</strong><small>Icons and illustrations</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.svgrepo.com/" target="_blank" rel="noreferrer">
+							<span><strong>SVG Repo</strong><small>Free SVG vectors and icons</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+				</ul>
+			</section>
+
+			<section class="resource-group" aria-labelledby="resource-stack-title">
+				<div class="resource-group-heading">
+					<span class="resource-index" aria-hidden="true">02</span>
+					<div>
+						<p class="eyebrow">THE BUILD KIT</p>
+						<h2 id="resource-stack-title">Built with</h2>
+					</div>
+				</div>
+				<p class="resource-intro">The tools that shape the site, from static pages to its interface styling.</p>
+				<ul class="resource-list">
+					<li>
+						<a href="https://astro.build/" target="_blank" rel="noreferrer">
+							<span><strong>Astro</strong><small>Static site framework</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://tailwindcss.com/" target="_blank" rel="noreferrer">
+							<span><strong>Tailwind CSS</strong><small>Utility-first styling</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://starwind.dev/" target="_blank" rel="noreferrer">
+							<span><strong>Starwind UI</strong><small>Accessible UI components for Astro</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+				</ul>
+			</section>
+
+			<section class="resource-group resource-hosting" aria-labelledby="resource-hosting-title">
+				<div class="resource-group-heading">
+					<span class="resource-index" aria-hidden="true">03</span>
+					<div>
+						<p class="eyebrow">WHERE IT LIVES</p>
+						<h2 id="resource-hosting-title">Hosting</h2>
+					</div>
+				</div>
+				<p class="resource-intro">This portfolio is currently hosted on Cloudflare’s free plan.</p>
+				<ul class="resource-list">
+					<li>
+						<a href="https://www.cloudflare.com/" target="_blank" rel="noreferrer">
+							<span><strong>Cloudflare</strong><small>Hosting · Free plan</small></span><span class="resource-arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+				</ul>
+			</section>
+		</div>
+		<p class="resources-note">A heartfelt thank-you to the people and teams who make these tools and resources available.</p>
+	</section>
+</Layout>

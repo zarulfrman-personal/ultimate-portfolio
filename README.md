@@ -15,7 +15,7 @@ The development server runs at `http://localhost:4321`. Build the static site wi
 
 Portfolio details and project content live in `src/data/portfolio.ts`. Each project becomes a static detail page at `/projects/<slug>/`; keep each `slug` unique and URL-friendly. Project images, videos, reports, and the resume are imported from `src/assets`.
 
-The project catalog, detail routes, About, Resume, and Contact pages are statically generated. Cart contents and the selected display currency are optional browser-side preferences stored in local storage; the rest of the portfolio works without JavaScript. Project prices are currently RM 0.00 and shown as “Free to peek.”
+The project catalog, detail routes, About, Resume, Contact, and Resources pages are statically generated. The Resources page credits the external visual-asset sources, the site stack, and Cloudflare hosting. Cart contents and the selected display currency are optional browser-side preferences stored in local storage; the rest of the portfolio works without JavaScript. Project prices are currently RM 0.00 and shown as “Free to peek.”
 
 ## Project structure
 
@@ -30,6 +30,7 @@ src/
     index.astro
     projects/[slug].astro
     resume.astro
+    resources.astro
   styles/global.css
 public/
 ```

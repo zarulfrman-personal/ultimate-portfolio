@@ -1,9 +1,12 @@
 ---
+import "@/styles/starwind.css";
 import '../styles/global.css';
 import { portfolio, projects } from '../data/portfolio';
 import { Image } from 'astro:assets';
 import shoppingCart from '../assets/shopping-cart.svg';
 import portfolioIcon from '../assets/portfolio-bodega.svg';
+import currencyIcon from '../assets/currency-svg.svg';
+import arrowDownIcon from '../assets/arrow-down-svg.svg';
 
 interface Props {
 	title?: string;
@@ -15,6 +18,7 @@ const {
 	description = portfolio.introduction,
 } = Astro.props;
 const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }));
+const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -27,6 +31,15 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 		<meta name="description" content={description} />
 		<meta name="theme-color" content="#ffffff" />
 		<title>{title}</title>
+		<script is:inline>
+			try {
+				if (localStorage.getItem('portfolio-shop-theme') === 'night') {
+					document.documentElement.classList.add('dark');
+				}
+			} catch {
+				document.documentElement.dataset.themeStorage = 'unavailable';
+			}
+		</script>
 	</head>
 	<body>
 		<a class="skip-link" href="#main-content">Skip to content</a>
@@ -37,25 +50,43 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 					<span>{portfolio.name}<small>BODEGA PORTFOLIO</small></span>
 				</a>
 				<nav class="main-nav" aria-label="Main navigation">
-					<a href="/#catalog">Work</a>
-					<a href="/about/">About</a>
-					<a href="/resume/">Resume</a>
-					<a href="/contact/">Contact</a>
+					<a class="nav-link" href="/#catalog" aria-current={currentPath === '/' || currentPath.startsWith('/projects/') ? 'page' : undefined}>Work</a>
+					<a class="nav-link" href="/about/" aria-current={currentPath === '/about/' ? 'page' : undefined}>About</a>
+					<a class="nav-link" href="/resume/" aria-current={currentPath === '/resume/' ? 'page' : undefined}>Resume</a>
+					<a class="nav-link" href="/contact/" aria-current={currentPath === '/contact/' ? 'page' : undefined}>Contact</a>
+					<a class="nav-link" href="/resources/" aria-current={currentPath === '/resources/' ? 'page' : undefined}>Resources</a>
 				</nav>
-				<label class="currency-selector">
-					<span class="visually-hidden">Display currency</span>
-					<select id="currency-select" aria-label="Display currency">
-						<option value="MYR" selected>MYR</option>
-						<option value="USD">USD</option>
-						<option value="EUR">EUR</option>
-						<option value="GBP">GBP</option>
-					</select>
-				</label>
-				<button class="bag-trigger" type="button" aria-expanded="false" aria-controls="bag-panel" aria-label="Open cart">
-					<Image src={shoppingCart} alt="" width={20} height={20} class="cart-icon" />
-					<span>Cart</span>
-					<span class="bag-count" id="bag-count" aria-live="polite">0</span>
-				</button>
+				<div class="header-actions">
+					<div class="currency-picker">
+						<button class="currency-trigger" id="currency-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="currency-menu" aria-label="Display currency: MYR">
+							<Image src={currencyIcon} alt="" width={19} height={19} class="currency-symbol" />
+							<span id="currency-current">MYR</span>
+							<Image src={arrowDownIcon} alt="" width={12} height={12} class="currency-caret" />
+						</button>
+						<div class="currency-menu" id="currency-menu" role="menu" aria-label="Choose display currency" hidden>
+							<button type="button" role="menuitemradio" aria-checked="true" data-currency-option="MYR">MYR <span>Malaysian ringgit</span></button>
+							<button type="button" role="menuitemradio" aria-checked="false" data-currency-option="USD">USD <span>US dollar</span></button>
+							<button type="button" role="menuitemradio" aria-checked="false" data-currency-option="EUR">EUR <span>Euro</span></button>
+							<button type="button" role="menuitemradio" aria-checked="false" data-currency-option="GBP">GBP <span>British pound</span></button>
+						</div>
+						<select class="currency-native-select" id="currency-select" aria-hidden="true" tabindex="-1">
+							<option value="MYR" selected>MYR</option>
+							<option value="USD">USD</option>
+							<option value="EUR">EUR</option>
+							<option value="GBP">GBP</option>
+						</select>
+					</div>
+					<button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to night mode">
+						<svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.1A8.3 8.3 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"></path></svg>
+						<svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+						<span class="theme-label">Night</span>
+					</button>
+					<button class="bag-trigger" type="button" aria-expanded="false" aria-controls="bag-panel" aria-label="Open cart">
+						<Image src={shoppingCart} alt="" width={20} height={20} class="cart-icon" />
+						<span>Cart</span>
+						<span class="bag-count" id="bag-count" aria-live="polite">0</span>
+					</button>
+				</div>
 			</header>
 
 			<main id="main-content">
@@ -65,7 +96,10 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 			<footer class="site-footer">
 				<a class="footer-wordmark" href="/">{portfolio.name}<span>© {new Date().getFullYear()}</span></a>
 				<p>Software, systems, and ideas made with care.</p>
-				<a href="/contact/">Let’s connect <span aria-hidden="true">↗</span></a>
+				<div class="footer-links">
+					<a href="/resources/">Resources <span aria-hidden="true">↗</span></a>
+					<a href="/contact/">Let’s connect <span aria-hidden="true">↗</span></a>
+				</div>
 			</footer>
 		</div>
 
@@ -87,7 +121,48 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 		</aside>
 
 		<script>
+			const siteHeader = document.querySelector<HTMLElement>('.site-header');
+			if (siteHeader) {
+				const updateHeaderScrollState = () => {
+					siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+				};
+				window.addEventListener('scroll', updateHeaderScrollState, { passive: true });
+				updateHeaderScrollState();
+			}
+
+			const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+
+			if (themeToggle) {
+				const updateThemeControl = () => {
+					const isNight = document.documentElement.classList.contains('dark');
+					themeToggle.setAttribute('aria-pressed', String(isNight));
+					themeToggle.setAttribute('aria-label', `Switch to ${isNight ? 'day' : 'night'} mode`);
+					themeToggle.querySelector<HTMLElement>('.theme-label')!.textContent = isNight ? 'Day' : 'Night';
+					if (themeColor) themeColor.content = isNight ? '#171714' : '#faf8f3';
+				};
+
+				themeToggle.addEventListener('click', () => {
+					const isNight = document.documentElement.classList.toggle('dark');
+					updateThemeControl();
+					try {
+						localStorage.setItem('portfolio-shop-theme', isNight ? 'night' : 'day');
+						themeToggle.removeAttribute('title');
+					} catch {
+						themeToggle.title = 'Theme preference could not be saved in this browser.';
+					}
+				});
+				updateThemeControl();
+				if (document.documentElement.dataset.themeStorage === 'unavailable') {
+					themeToggle.title = 'Theme preference could not be loaded in this browser.';
+				}
+			}
+
 			const currencySelect = document.querySelector<HTMLSelectElement>('#currency-select');
+			const currencyTrigger = document.querySelector<HTMLButtonElement>('#currency-trigger');
+			const currencyCurrent = document.querySelector<HTMLElement>('#currency-current');
+			const currencyMenu = document.querySelector<HTMLElement>('#currency-menu');
+			const currencyOptions = document.querySelectorAll<HTMLButtonElement>('[data-currency-option]');
 			let currentCurrency = 'MYR';
 			if (currencySelect) {
 				const supportedCurrencies = ['MYR', 'USD', 'EUR', 'GBP'];
@@ -101,6 +176,60 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 					currencySelect.title = 'Currency preference could not be loaded in this browser.';
 				}
 			}
+			const updateCurrencyControl = () => {
+				if (!currencySelect || !currencyTrigger || !currencyCurrent) return;
+				currencyCurrent.textContent = currencySelect.value;
+				currencyTrigger.setAttribute('aria-label', `Display currency: ${currencySelect.value}`);
+				currencyOptions.forEach((option) => {
+					const selected = option.dataset.currencyOption === currencySelect.value;
+					option.setAttribute('aria-checked', String(selected));
+				});
+			};
+			const closeCurrencyMenu = (restoreFocus = false) => {
+				if (!currencyMenu || !currencyTrigger) return;
+				currencyMenu.hidden = true;
+				currencyTrigger.setAttribute('aria-expanded', 'false');
+				if (restoreFocus) currencyTrigger.focus();
+			};
+			const openCurrencyMenu = () => {
+				if (!currencyMenu || !currencyTrigger) return;
+				currencyMenu.hidden = false;
+				currencyTrigger.setAttribute('aria-expanded', 'true');
+				Array.from(currencyOptions).find((option) => option.getAttribute('aria-checked') === 'true')?.focus();
+			};
+			currencyTrigger?.addEventListener('click', () => {
+				currencyTrigger.getAttribute('aria-expanded') === 'true' ? closeCurrencyMenu() : openCurrencyMenu();
+			});
+			currencyOptions.forEach((option, index) => {
+				option.addEventListener('click', () => {
+					if (!currencySelect) return;
+					currencySelect.value = option.dataset.currencyOption ?? 'MYR';
+					currencySelect.dispatchEvent(new Event('change', { bubbles: true }));
+					closeCurrencyMenu(true);
+				});
+				option.addEventListener('keydown', (event) => {
+					if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+					event.preventDefault();
+					const nextIndex = event.key === 'Home'
+						? 0
+						: event.key === 'End'
+							? currencyOptions.length - 1
+							: (index + (event.key === 'ArrowDown' ? 1 : -1) + currencyOptions.length) % currencyOptions.length;
+					currencyOptions[nextIndex]?.focus();
+				});
+			});
+			currencyMenu?.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape') {
+					event.preventDefault();
+					closeCurrencyMenu(true);
+				}
+			});
+			document.addEventListener('click', (event) => {
+				if (event.target instanceof Element && !event.target.closest('.currency-picker')) {
+					closeCurrencyMenu();
+				}
+			});
+			updateCurrencyControl();
 			const formatPrice = (amount: number) => new Intl.NumberFormat('en-MY', {
 				style: 'currency',
 				currency: currentCurrency,
@@ -241,6 +370,7 @@ const catalog = projects.map(({ slug, title, price }) => ({ slug, title, price }
 
 				currencySelect?.addEventListener('change', () => {
 					currentCurrency = currencySelect.value;
+					updateCurrencyControl();
 					try {
 						localStorage.setItem('portfolio-shop-currency', currentCurrency);
 					} catch {

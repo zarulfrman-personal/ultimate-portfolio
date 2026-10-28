@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
+import { Button } from '@starwind-ui/astro/button';
 import { portfolio, projects } from '../data/portfolio';
 import { Image } from 'astro:assets';
 
@@ -13,8 +14,7 @@ const categories = [...new Set(projects.map((project) => project.category))];
 	<section class="hero">
 		<div class="hero-copy">
 			<p class="eyebrow"><span class="status-dot"></span> {portfolio.availability}</p>
-			<!-- <h1>Useful things,<br /><span>made with intent.</span></h1> -->
-			 <h1>Welcome to Zarul's Portfolio.. <span>bodega?</span></h1>
+			<h1>Welcome to Zarul's<br /><span>little bodega.</span></h1>
 			<p class="hero-intro">{portfolio.introduction}</p>
 			<div class="hero-actions">
 				<a class="button button-dark" href="#catalog">Explore selected work <span aria-hidden="true">↓</span></a>
@@ -25,7 +25,8 @@ const categories = [...new Set(projects.map((project) => project.category))];
 			</div>
 		</div>
 		<a class:list={['hero-feature', `art-${featuredProject.color}`]} href={`/projects/${featuredProject.slug}/`}>
-			<span class="feature-label">FEATURED PRODUCT? <span aria-hidden="true">01 — 05</span></span>
+			<span class="feature-sticker">ON THE SHELF <b aria-hidden="true">✳</b></span>
+			<span class="feature-label">THE FEATURED FIND <span aria-hidden="true">{featuredProject.mark} — {String(projects.length).padStart(2, '0')}</span></span>
 			{featuredProject.previewImage && (
 				<Image
 					class="feature-image"
@@ -43,9 +44,8 @@ const categories = [...new Set(projects.map((project) => project.category))];
 
 	<section class="ticker" aria-label="Portfolio note">
 		<div class="ticker-track" aria-hidden="true">
-			<span>SELECTED PROJECTS</span><b>✳</b><span>SOFTWARE & SYSTEMS</span><b>✳</b><span>BUILT WITH CURIOSITY</span><b>✳</b>
-			<span>SELECTED PROJECTS</span><b>✳</b><span>SOFTWARE & SYSTEMS</span><b>✳</b><span>BUILT WITH CURIOSITY</span><b>✳</b>
-			<span>SELECTED PROJECTS</span>
+			<div class="ticker-set"><span>SELECTED PROJECTS</span><b>✳</b><span>SOFTWARE &amp; SYSTEMS</span><b>✳</b><span>BUILT WITH CURIOSITY</span><b>✳</b></div>
+			<div class="ticker-set"><span>SELECTED PROJECTS</span><b>✳</b><span>SOFTWARE &amp; SYSTEMS</span><b>✳</b><span>BUILT WITH CURIOSITY</span><b>✳</b></div>
 		</div>
 	</section>
 
@@ -59,19 +59,27 @@ const categories = [...new Set(projects.map((project) => project.category))];
 		</div>
 		<div class="catalog-toolbar">
 			<div class="filter-list" role="group" aria-label="Filter projects by category">
-				<button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Everything <span>{projects.length}</span></button>
+				<Button.Root class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Everything <span>{projects.length}</span></Button.Root>
 				{categories.map((category) => (
-					<button class="filter-button" type="button" data-filter={category} aria-pressed="false">{category}</button>
+					<Button.Root class="filter-button" type="button" data-filter={category} aria-pressed="false">{category}</Button.Root>
 				))}
 			</div>
-			<p class="bag-caption"><span aria-hidden="true">＋</span> Add a project to your cart</p>
+			<div class="catalog-tools">
+				<label class="project-search">
+					<span class="visually-hidden">Search projects</span>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+					<input type="search" id="project-search" placeholder="Search the shelves..." autocomplete="off" />
+				</label>
+				<p class="bag-caption"><span aria-hidden="true">＋</span> Add a project to your cart</p>
+			</div>
 		</div>
 
 		<div class="product-grid">
 			{featuredProject && <ProductCard project={featuredProject} />}
 			{otherProjects.map((project) => <ProductCard project={project} />)}
 		</div>
-		<p class="catalog-empty" hidden>No projects in this category just yet. Try another filter.</p>
+		<p class="catalog-results" id="catalog-results" aria-live="polite" aria-atomic="true"></p>
+		<p class="catalog-empty" hidden>No projects found. Try another search or choose Everything.</p>
 	</section>
 
 	<section class="about-strip">
@@ -89,23 +97,40 @@ const categories = [...new Set(projects.map((project) => project.category))];
 		const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
 		const productCards = document.querySelectorAll<HTMLElement>('.product-card');
 		const catalogEmpty = document.querySelector<HTMLElement>('.catalog-empty');
+		const projectSearch = document.querySelector<HTMLInputElement>('#project-search');
+		const catalogResults = document.querySelector<HTMLElement>('#catalog-results');
+		let activeCategory = 'all';
 
 		filterButtons.forEach((button) => {
 			button.addEventListener('click', () => {
-				const category = button.dataset.filter;
-				let visibleCount = 0;
+				activeCategory = button.dataset.filter ?? 'all';
 				filterButtons.forEach((filter) => {
 					const active = filter === button;
 					filter.classList.toggle('is-active', active);
 					filter.setAttribute('aria-pressed', String(active));
 				});
-				productCards.forEach((card) => {
-					const matches = category === 'all' || card.dataset.category === category;
-					card.hidden = !matches;
-					if (matches) visibleCount += 1;
-				});
-				if (catalogEmpty) catalogEmpty.hidden = visibleCount > 0;
+				updateCatalog();
 			});
 		});
+
+		const updateCatalog = () => {
+			const query = projectSearch?.value.trim().toLocaleLowerCase() ?? '';
+			let visibleCount = 0;
+			productCards.forEach((card) => {
+				const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+				const matchesQuery = (card.dataset.search ?? '').toLocaleLowerCase().includes(query);
+				const matches = matchesCategory && matchesQuery;
+				card.hidden = !matches;
+				if (matches) visibleCount += 1;
+			});
+			if (catalogEmpty) catalogEmpty.hidden = visibleCount > 0;
+			if (catalogResults) {
+				catalogResults.textContent = query || activeCategory !== 'all'
+					? `${visibleCount} ${visibleCount === 1 ? 'project' : 'projects'} found`
+					: '';
+			}
+		};
+
+		projectSearch?.addEventListener('input', updateCatalog);
 	</script>
 </Layout>
